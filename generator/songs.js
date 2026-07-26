@@ -1,4 +1,7 @@
 import { asStorageUrl, asHlsUrl, toUnixSeconds, writeAllArtifacts } from "./common.js";
+import { init } from "@bokuweb/zstd-wasm";
+
+import { songsDatabaseSchema } from "./songs.zod.js"
 
 export async function fetchSongs(page, pageSize) {
     return await (await fetch("https://api.neurokaraoke.com/api/songs", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ page, pageSize }) })).json();
@@ -30,14 +33,12 @@ export function convertSong(song) {
 }
 
 // you may strip the following code if you are using this as a module
-
-import { init } from "@bokuweb/zstd-wasm";
 if (import.meta.url === `file://${process.argv[1]}`) {    
     await init();
     
     console.log("Fetching songs...");
     let songs = await fetchSongs(1, (await fetchSongs(1, 0)).totalCount);
     if (songs.items.length !== songs.totalCount) throw Error(`Recieved ${songs.items.length} songs, expected ${songs.totalCount}`);
-    console.log("Converting songs...");
-    writeAllArtifacts("songs", songs.items.map(convertSong));
+    console.log("Converting & validating songs...");
+    writeAllArtifacts("songs", songsDatabaseSchema.parse(songs.items.map(convertSong)));
 }

@@ -1,4 +1,7 @@
 import { asImageUrl, writeAllArtifacts } from "./common.js";
+import { init } from "@bokuweb/zstd-wasm";
+
+import { artDatabaseSchema } from "./art.zod.js"
 
 export async function fetchArt(page, pageSize) {
     return await (await fetch(`https://api.neurokaraoke.com/api/media/gallery?page=${page}&pageSize=${pageSize}`)).json();
@@ -29,9 +32,6 @@ export function convertArt(art) {
     }
 }
 
-// you may strip the following code if you are using this as a module
-
-import { init } from "@bokuweb/zstd-wasm";
 if (import.meta.url === `file://${process.argv[1]}`) {    
     await init();
     
@@ -47,6 +47,6 @@ if (import.meta.url === `file://${process.argv[1]}`) {
         art.items.push(...a.items);
     }
     if (art.items.length !== art.totalCount) throw Error(`Recieved ${art.items.length} songs, expected ${art.totalCount}`);
-    console.log("Converting art...");
-    writeAllArtifacts("art", art.items.map(convertArt));
+    console.log("Converting & validating art...");
+    writeAllArtifacts("art", artDatabaseSchema.parse(art.items.map(convertArt)));
 }
