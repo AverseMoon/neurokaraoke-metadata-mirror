@@ -24,7 +24,7 @@ jobs:
               run: npm install
 
             - name: Generate validation schema
-              run: npx ts-to-zod ../schemas/songs.d.ts ./songs.zod.ts
+              run: npx ts-to-zod ../schemas/songs.d.ts ./songs.zod.js
     
             - name: Generate database
               run: node ./songs.js
@@ -59,7 +59,7 @@ jobs:
               run: npm install
 
             - name: Generate validation schema
-              run: npx ts-to-zod ../schemas/art.d.ts ./art.zod.ts
+              run: npx ts-to-zod ../schemas/art.d.ts ./art.zod.js
     
             - name: Generate database
               run: node ./art.js
