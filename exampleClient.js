@@ -1,19 +1,19 @@
 import { createHash } from "node:crypto";
 import readline from "node:readline/promises"
 
-const URL = "https://raw.githubusercontent.com/AverseMoon/neurokaraoke-metadata-mirror/";
+const URL = "https://raw.githubusercontent.com/AverseMoon/neurokaraoke-metadata-mirror/main/artifacts/";
 
 let songs = [];
 let lastHash = null;
 
 // you can expand this further to cache to disk
 async function update_songs() {
-    let hash = (await (await fetch(URL + "main/artifacts/songs.json.sha256")).text()).trim();
+    let hash = (await (await fetch(URL + "songs.json.sha256")).text()).trim();
     if (lastHash !== hash) {
         console.log("Updating cached song database...");
         let i = 1;
         while (true) {
-            let newSongs = await (await fetch(URL + "main/artifacts/songs.json")).text();
+            let newSongs = await (await fetch(URL + "songs.json")).text();
             lastHash = createHash("sha256").update(newSongs).digest("hex");
             if (lastHash !== hash) {
                 if (i++ >= 5) throw Error("Retried too many times.");

@@ -16,7 +16,6 @@ export function convertSong(song) {
         
         duration: song.duration ?? 0,
         streamTime: toUnixSeconds(song.streamDate),
-        timeAdded: toUnixSeconds(song.dateAdded),
 
         uuid: song.id,
         coverArtUuid: song.coverArt == null ? null : song.coverArt.id,

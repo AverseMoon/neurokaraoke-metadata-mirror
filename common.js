@@ -12,12 +12,12 @@ export function asHlsUrl(url) {
 }
 
 export function asImageUrl(cloudflareId) {
-    return cloudflareId == null ? null : "https://imagedelivery.net/WxURxyML82UkE7gY-PiBKw/" + cloudflareId + "/"
+    return cloudflareId == null ? null : "https://images.neurokaroke.com/WxURxyML82UkE7gY-PiBKw/" + cloudflareId + "/"
 }
 
 export function toUnixSeconds(iso) {
-    // it appears that they might be in utc or something, however they dont end with a suffix, so i append Z to interpret them as a utc timestamp
-    return iso == null ? null : Math.floor(Date.parse(iso + 'Z') / 1000);
+    // it appears soul forgot to call SpecifyKind on their DateTime objects, if this gets fixed, the code should still work
+    return iso == null ? null : Math.floor(Date.parse(iso.endsWith('Z') ? iso : iso + 'Z') / 1000);
 }
 
 export function write(name, data) {

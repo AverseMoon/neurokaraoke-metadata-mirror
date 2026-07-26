@@ -14,8 +14,6 @@ export interface Song {
     duration: number;
     /// the time that the song was streamed (i believe first streamed, however i may be wrong), in the form of unix seconds
     streamTime: number;
-    /// the time that the song was added to neurokaraoke.com, this is almost always null for some reason
-    timeAdded?: number | null;
     
 
     // --- urls and advanced info ---
@@ -23,7 +21,7 @@ export interface Song {
     uuid: string;
     /// the uuid of the cover art, i have no idea why a few songs dont have this set
     coverArtUuid?: string | null;
-    /// the uuid for the video of the original stream
+    /// the uuid for the video of the most recent performance, you can use this as a flag to determine if it has video
     videoUuid?: string | null;
     /// whether the song has lyrics
     hasLyrics: boolean;
