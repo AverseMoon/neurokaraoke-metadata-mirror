@@ -1,6 +1,5 @@
 use std::borrow::Cow;
 use std::fs;
-use std::fs::File;
 use std::io::Cursor;
 use std::ops::Deref;
 use std::path::PathBuf;
