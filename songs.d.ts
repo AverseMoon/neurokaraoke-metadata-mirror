@@ -7,12 +7,12 @@ export interface Song {
     title: string;
     /// the original artist(s) of the song
     artists: string[];
-    /// who covered the song (eg. ["Neuro", "MinikoMew"])
+    /// who covered the song (e.g. ["Neuro", "MinikoMew"])
     coveredBy: string[];
     
     /// the duration of the song (in seconds)
     duration: number;
-    /// the time that the song was streamed (i believe first streamed, however i may be wrong), in the form of unix seconds
+    /// the first? (i think) time that the song was performed, in the form of unix seconds
     streamTime: number;
     
 
@@ -25,8 +25,6 @@ export interface Song {
     videoUuid?: string | null;
     /// whether the song has lyrics
     hasLyrics: boolean;
-    /// should be false in songs.json, however if you are converting songs you fetch from playlists and stuff it may be true
-    isUserUploaded: boolean;
     /// absolute urls to audio files
     audio: {
         /// you can assume mp3 will be available

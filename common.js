@@ -12,7 +12,7 @@ export function asHlsUrl(url) {
 }
 
 export function asImageUrl(cloudflareId) {
-    return cloudflareId == null ? null : "https://images.neurokaroke.com/WxURxyML82UkE7gY-PiBKw/" + cloudflareId + "/"
+    return cloudflareId == null ? null : "https://images.neurokaraoke.com/WxURxyML82UkE7gY-PiBKw/" + cloudflareId + "/"
 }
 
 export function toUnixSeconds(iso) {

@@ -15,13 +15,12 @@ export function convertSong(song) {
         coveredBy: song.coverArtists ?? [],
         
         duration: song.duration ?? 0,
-        streamTime: toUnixSeconds(song.streamDate),
+        streamTime: toUnixSeconds(song.streamDate) ?? 0,
 
-        uuid: song.id,
+        uuid: song.id ?? "",
         coverArtUuid: song.coverArt == null ? null : song.coverArt.id,
         videoUuid: song.videoId,
         hasLyrics: song.hasLyrics ?? false,
-        isUserUploaded: song.userUploaded ?? false,
         audio: {
             mp3: asStorageUrl(song.absolutePath ?? song.oss),
             opus: asStorageUrl(song.opus),

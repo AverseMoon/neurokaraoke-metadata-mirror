@@ -10,22 +10,22 @@ export async function fetchArt(page, pageSize) {
  */
 export function convertArt(art) {
     return {
-        description: art.description,
-        isAnimated: art.isAnimated,
+        description: art.description ?? "",
+        isAnimated: art.isAnimated ?? false,
         credit: art.credit,
-        tags: art.tagString.split(", "),
-        isSensitive: art.isSensitive,
+        tags: art.tagString?.split(", ") ?? [],
+        isSensitive: art.isSensitive ?? false,
         artist: art.artist == null ? null : {
-            name: art.artist.name,
+            name: art.artist.name ?? "",
             socialLink: art.artist.socialLink,
             
-            uuid: art.artist.id,
+            uuid: art.artist.id ?? "",
             userUuid: art.artist.userId,
         },
 
-        uuid: art.id,
-        cloudflareId: art.cloudflareId,
-        cloudflareUrl: asImageUrl(art.cloudflareId),
+        uuid: art.id ?? "",
+        cloudflareId: art.cloudflareId ?? "",
+        cloudflareUrl: asImageUrl(art.cloudflareId) ?? "",
     }
 }
 
