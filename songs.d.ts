@@ -21,8 +21,8 @@ export interface Song {
     // --- urls and advanced info ---
     /// the song uuid
     uuid: string;
-    /// the uuid of the cover art
-    coverArtUuid: string;
+    /// the uuid of the cover art, i have no idea why a few songs dont have this set
+    coverArtUuid?: string | null;
     /// the uuid for the video of the original stream
     videoUuid?: string | null;
     /// whether the song has lyrics
