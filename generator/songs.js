@@ -6,7 +6,7 @@ export async function fetchSongs(page, pageSize) {
 
 /**
  * This is the function you want to use if you are using this as a library 
- * @returns {import("./songs.d.ts").Song}
+ * @returns {import("../schemas/songs.d.ts").Song}
  */
 export function convertSong(song) {
     return {

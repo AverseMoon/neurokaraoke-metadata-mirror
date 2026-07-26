@@ -21,16 +21,16 @@ export function toUnixSeconds(iso) {
 }
 
 export function write(name, data) {
-    writeFileSync("./artifacts/" + name, data);
-    writeFileSync("./artifacts/" + name + ".sha256", createHash("sha256").update(data).digest("hex"))
+    writeFileSync("../artifacts/" + name, data);
+    writeFileSync("../artifacts/" + name + ".sha256", createHash("sha256").update(data).digest("hex"))
     data = compress(Buffer.from(data), 15);
-    writeFileSync("./artifacts/" + name + ".zst", data);
-    writeFileSync("./artifacts/" + name + ".zst.sha256", createHash("sha256").update(data).digest("hex"))
+    writeFileSync("../artifacts/" + name + ".zst", data);
+    writeFileSync("../artifacts/" + name + ".zst.sha256", createHash("sha256").update(data).digest("hex"))
 };
 
 export function writeAllArtifacts(name, data) {
     console.log("Ensuring artifacts folder exists...");
-    mkdirSync("./artifacts", { recursive: true })
+    mkdirSync("../artifacts", { recursive: true })
     
     console.log("Encoding & Writing JSON...");
     write(name + ".json", JSON.stringify(data));

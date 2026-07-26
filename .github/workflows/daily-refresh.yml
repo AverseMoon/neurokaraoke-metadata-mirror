@@ -10,6 +10,9 @@ jobs:
         runs-on: ubuntu-latest
         permissions:
             contents: write
+        defaults:
+            run:
+                working-directory: ./generator
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -21,7 +24,7 @@ jobs:
               run: npm install
     
             - name: Generate database
-              run: node songs.js
+              run: node ./songs.js
 
             - name: Commit changes
               run: |
@@ -37,6 +40,9 @@ jobs:
         runs-on: ubuntu-latest
         permissions:
             contents: write
+        defaults:
+            run:
+                working-directory: ./generator
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -48,7 +54,7 @@ jobs:
               run: npm install
     
             - name: Generate database
-              run: node art.js
+              run: node ./art.js
 
             - name: Commit changes
               run: |

@@ -6,7 +6,7 @@ export async function fetchArt(page, pageSize) {
 
 /**
  * This is the function you want to use if you are using this as a library 
- * @returns {import("./art.d.ts").Artwork} 
+ * @returns {import("../schemas/art.d.ts").Artwork} 
  */
 export function convertArt(art) {
     return {
