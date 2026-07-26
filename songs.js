@@ -1,4 +1,4 @@
-import { asStorageUrl, asHlsUrl, toUnixSeconds } from "./common.js";
+import { asStorageUrl, asHlsUrl, toUnixSeconds, writeAllArtifacts } from "./common.js";
 
 export async function fetchSongs(page, pageSize) {
     return await (await fetch("https://api.neurokaraoke.com/api/songs", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ page, pageSize }) })).json();
@@ -27,39 +27,18 @@ export function convertSong(song) {
             opus: asStorageUrl(song.opus),
             hls: asHlsUrl(song.hls),
         },
-        
     };
 }
 
 // you may strip the following code if you are using this as a module
 
-import { writeFileSync, mkdirSync } from "node:fs";
-import { encode } from "@msgpack/msgpack";
-import { init, compress } from "@bokuweb/zstd-wasm";
-import { createHash } from "node:crypto";
+import { init } from "@bokuweb/zstd-wasm";
 if (import.meta.url === `file://${process.argv[1]}`) {    
     await init();
     
     console.log("Fetching songs...");
     let songs = await fetchSongs(1, (await fetchSongs(1, 0)).totalCount);
     if (songs.items.length !== songs.totalCount) throw Error(`Recieved ${songs.items.length} songs, expected ${songs.totalCount}`);
-    console.log("Mapping songs...");
-    let mappedSongs = songs.items.map(convertSong);
-    
-    console.log("Ensuring artifacts folder exists...");
-    mkdirSync("./artifacts", { recursive: true })
-
-    const write = (name, data) => {
-        writeFileSync("./artifacts/" + name, data);
-        writeFileSync("./artifacts/" + name + ".sha256", createHash("sha256").update(data).digest("hex"))
-        data = compress(Buffer.from(data), 15);
-        writeFileSync("./artifacts/" + name + ".zst", data);
-        writeFileSync("./artifacts/" + name + ".zst.sha256", createHash("sha256").update(data).digest("hex"))
-    };
-    
-    console.log("Encoding & Writing JSON...");
-    write("songs.json", JSON.stringify(mappedSongs));
-    console.log("Encoding & Writing Msgpack...");
-    write("songs.msgpack", encode(mappedSongs));
-    console.log("Done!");
+    console.log("Converting songs...");
+    writeAllArtifacts("songs", songs.items.map(convertSong));
 }
