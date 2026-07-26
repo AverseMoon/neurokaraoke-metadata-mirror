@@ -19,6 +19,7 @@ export function convertSong(song) {
         timeAdded: toUnixSeconds(song.dateAdded),
 
         uuid: song.id,
+        coverArtUuid: song.coverArt.id,
         videoUuid: song.videoId,
         hasLyrics: song.hasLyrics ?? false,
         isUserUploaded: song.userUploaded ?? false,

@@ -1,9 +1,8 @@
 # `neurokaraoke.com` Metadata Mirror
-Mirror of the neurokaraoke.com metadata for songs, art, and potentially more in the future using a fixed, documented spec, useful for offline search or avoiding the undocumented apis.
+Mirror of the neurokaraoke.com metadata for songs, art, and potentially more in the future using a documented schema.
 
 ## TODO:
-- add cover art to the songs
-- add an art generator
+- see if i can find something better than github for hosting this, if you have any ideas, let me know
 
 ## Schema Documentation
 Documentation can be found in the `.d.ts` files!
