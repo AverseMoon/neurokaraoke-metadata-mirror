@@ -16,8 +16,6 @@ jobs:
     
             - name: Setup Node
               uses: actions/setup-node@v4
-              with:
-                  node-version: 24
     
             - name: Install dependencies
               run: npm install
@@ -46,8 +44,6 @@ jobs:
     
             - name: Setup Node
               uses: actions/setup-node@v4
-              with:
-                  node-version: 24
     
             - name: Install dependencies
               run: npm install
@@ -60,7 +56,7 @@ jobs:
                   git config user.name "github-actions[bot]"
                   git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
                 
-                  git diff --quiet artifacts/ && exit 0
+                  #git diff --quiet artifacts/ && exit 0
 
                   git add artifacts/
             
