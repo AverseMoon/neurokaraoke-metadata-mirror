@@ -269,7 +269,6 @@ impl<T: DeserializeOwned> DatabaseBuilder<T> {
         self
     }
 
-    /// full artifacts url, e.g. https://raw.githubusercontent.com/AverseMoon/neurokaraoke-metadata-mirror/main/artifacts/
     pub fn artifact_name(mut self, name: impl Into<String>) -> Self {
         self.db.artifact_name = name.into();
         self
