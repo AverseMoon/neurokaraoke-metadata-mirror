@@ -40,7 +40,11 @@ jobs:
                   git diff --cached --quiet artifacts/ && exit 0
             
                   git commit -m "Update songs database"
-                  git push
+                  if ! git push; then
+                      git pull --rebase
+                      git push
+                  fi
+                  
     art:
         runs-on: ubuntu-latest
         permissions:
@@ -75,4 +79,7 @@ jobs:
                   git diff --cached --quiet artifacts/ && exit 0
                              
                   git commit -m "Update art database"
-                  git push
+                  if ! git push; then
+                      git pull --rebase
+                      git push
+                  fi
