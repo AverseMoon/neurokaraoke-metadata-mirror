@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 use std::fs;
 use std::io::Cursor;
-use std::ops::Deref;
+use std::ops::{Deref, Index};
 use std::path::PathBuf;
 use std::time::Duration;
 use serde::{Deserialize, Serialize};
@@ -29,6 +29,10 @@ mod duration_secs {
     {
         Ok(Duration::from_secs(u64::deserialize(d)?))
     }
+}
+
+pub trait AsUuid {
+    fn uuid(&self) -> Uuid;
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -73,6 +77,12 @@ pub struct Song {
     pub audio: SongAudio,
 }
 
+impl AsUuid for Song {
+    fn uuid(&self) -> Uuid {
+        self.uuid
+    }
+}
+
 #[serde_as]
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -87,6 +97,12 @@ pub struct Artist {
     #[serde_as(as = "Option<DisplayFromStr>")]
     /// the uuid of the artist's account
     pub user_uuid: Option<Uuid>,
+}
+
+impl AsUuid for Artist {
+    fn uuid(&self) -> Uuid {
+        self.uuid
+    }
 }
 
 #[serde_as]
@@ -115,6 +131,12 @@ pub struct Artwork {
     pub cloudflare_url: Url,
 }
 
+impl AsUuid for Artwork {
+    fn uuid(&self) -> Uuid {
+        self.uuid
+    }
+}
+
 #[derive(Debug, Clone)]
 enum DatabaseFormat {
     Json,
@@ -126,9 +148,11 @@ enum DatabaseCompressionFormat {
     Zstd,
 }
 
+
+
 #[derive(Debug, Clone)]
 /// represents a remote database connection
-pub struct Database<T: DeserializeOwned> {
+pub struct Database<T: DeserializeOwned + AsUuid> {
     pub(crate) db: Vec<T>,
     pub(crate) hash: [u8; 32],
     pub(crate) url: Url,
@@ -138,7 +162,14 @@ pub struct Database<T: DeserializeOwned> {
     pub(crate) cache_file: Option<PathBuf>,
 }
 
-impl<T: DeserializeOwned> Database<T> {
+impl<T: DeserializeOwned + AsUuid> Database<T> {
+    pub fn mutate(&mut self, mutator: impl FnOnce(&mut Vec<T>)) {
+        mutator(&mut self.db);
+        self.sort();
+    }
+    pub(crate) fn sort(&mut self) {
+        self.db.sort_by(|a, b| a.uuid().cmp(&b.uuid()));
+    }
     pub(crate) fn deserialize_from(&self, data: &[u8]) -> anyhow::Result<Vec<T>> {
         let decompressed = match self.compression {
             DatabaseCompressionFormat::Uncompressed => Cow::Borrowed(data),
@@ -150,7 +181,7 @@ impl<T: DeserializeOwned> Database<T> {
             DatabaseFormat::Msgpack => Ok(rmp_serde::from_slice(decompressed.as_ref())?),
         }
     }
-    pub async fn check_for_updates(&mut self) -> anyhow::Result<()> {
+    pub async fn check_for_updates(&mut self) -> anyhow::Result<bool> {
         let base_url = self.url.to_string() + &*self.artifact_name + match self.format {
             DatabaseFormat::Json => ".json",
             DatabaseFormat::Msgpack => ".msgpack",
@@ -176,45 +207,64 @@ impl<T: DeserializeOwned> Database<T> {
                     continue;
                 }
                 self.db = self.deserialize_from(bytes.as_ref())?;
+                self.sort();
                 if let Some(cache_file) = self.cache_file.as_ref() {
                     fs::write(cache_file, bytes)?;
                     println!("Written to cache");
                 }
                 break;
             }
+
+            return Ok(true);
         }
 
-        Ok(())
+        Ok(false)
     }
     pub(crate) async fn init(&mut self, update_check: bool) -> anyhow::Result<()> {
+        let mut loaded = false;
         if let Some(cache_file) = self.cache_file.as_ref() && cache_file.exists() {
             println!("Loading from cache...");
             if let Ok(text) = fs::read(cache_file) && let Ok(db) = self.deserialize_from(text.as_slice()) {
                 self.hash = Sha256::digest(text.as_slice()).into();
                 self.db = db;
+                self.sort();
+                loaded = true;
             } else {
                 println!("Cache load error");
             }
-        } else if !update_check {
-            return Err(anyhow::anyhow!("Cache not initialized"))
         }
 
         if update_check {
-            self.check_for_updates().await
+            match self.check_for_updates().await {
+                Ok(_) => loaded = true,
+                Err(_) => println!("Update check failed"),
+            };
+        }
+
+        if !loaded {
+            Err(anyhow::anyhow!("Failed to load"))
         } else {
             Ok(())
         }
     }
 }
 
-impl<T: DeserializeOwned> Deref for Database<T> {
+impl<T: DeserializeOwned + AsUuid> Index<Uuid> for Database<T> {
+    type Output = T;
+
+    fn index(&self, uuid: Uuid) -> &Self::Output {
+        &self.db[self.db.binary_search_by_key(&uuid, AsUuid::uuid).unwrap()]
+    }
+}
+
+impl<T: DeserializeOwned + AsUuid> Deref for Database<T> {
     type Target = Vec<T>;
     fn deref(&self) -> &Self::Target {
         &self.db
     }
 }
 
-pub struct DatabaseBuilder<T: DeserializeOwned> {
+pub struct DatabaseBuilder<T: DeserializeOwned + AsUuid> {
     pub(crate) db: Database<T>,
     pub(crate) run_update_check_on_init: bool,
 }
@@ -231,7 +281,7 @@ impl DatabaseBuilder<Artwork> {
     }
 }
 
-impl<T: DeserializeOwned> DatabaseBuilder<T> {
+impl<T: DeserializeOwned + AsUuid> DatabaseBuilder<T> {
     pub fn custom_type() -> Self {
         Self {
             db: Database {
