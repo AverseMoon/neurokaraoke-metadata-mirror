@@ -41,7 +41,7 @@ jobs:
             
                   git commit -m "Update songs database"
                   if ! git push; then
-                      git pull --rebase
+                      git pull --rebase || exit 1
                       git push
                   fi
                   
@@ -80,6 +80,6 @@ jobs:
                              
                   git commit -m "Update art database"
                   if ! git push; then
-                      git pull --rebase
+                      git pull --rebase || exit 1
                       git push
                   fi
